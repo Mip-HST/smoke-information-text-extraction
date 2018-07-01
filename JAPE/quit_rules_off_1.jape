@@ -1,0 +1,37 @@
+Phase: firstpass
+Input: Token Lookup FalsePositivePPD NUMBER Split
+Options: control = appelt
+Macro: NUMBER
+(({Token.kind == number} | {Lookup.majorType == number}) 
+| 
+({Token.string == ">"}
+({Token.kind == number} | {Lookup.majorType == number})
+)
+)
+
+Macro: NUMBER_BEFORE
+(NUMBER
+({Token.kind == number} | {Lookup.majorType == number} | {Token.string == "-"} | {Token.string == "+"} | {Token.string == "."})[0,6]
+)
+
+Rule: FalsePositivePPD //5. ppd
+Priority: 25
+(NUMBER
+({Token.kind == symbol} | {Token.kind == punctuation})
+{Token.string == "ppd"}
+):fp_ppd
+-->
+:fp_ppd.FalsePositivePPD = {rule = "FalsePositivePPD"}
+
+
+Rule: PackYearTest
+Priority: 30
+(
+    // ({Token.kind == number, Token.length != 4} | {Lookup.majorType == number})
+    // ({Token.string == "."}) //| {Token.string == "cigarette"} | {Token.string == "-"} | {Token.kind == word, !Split.kind == external, Token.string != "quit-"})?
+    {Token.kind == number}
+    {Lookup.majorType == packyears}
+
+):packyear
+-->
+:packyear.PPYtest = {rule = "packyears"}//, years = :number.Token.string}//, name = :number.Token.length
