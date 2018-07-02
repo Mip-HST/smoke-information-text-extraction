@@ -1,0 +1,132 @@
+Phase: FalsePositives
+Input: Token Lookup FalsePositivePPD NUMBER Split
+Options: control = appelt
+
+Macro: NUMBER
+(({Token.kind == number} | {Lookup.majorType == number}) 
+| 
+({Token.string == ">"}
+({Token.kind == number} | {Lookup.majorType == number})
+)
+)
+
+Macro: NUMBER_BEFORE
+(NUMBER
+({Token.kind == number} | {Lookup.majorType == number} | {Token.string == "-"} | {Token.string == "+"} | {Token.string == "."})[0,6]
+)
+
+Rule: NumberPPY
+Priority: 30
+(
+    (
+    {Token.string == "-"}
+    ({Token.kind == number, Token.length != 4} | {Lookup.majorType == number})
+    ({Token.string == "/"} | {Token.string == "."})?
+    ({Token.kind == number, Token.length != 4} | {Lookup.majorType == number})?
+)
+|
+(
+    ({Token.kind == number, Token.length != 4} | {Lookup.majorType == number})
+    ({Token.string == "/"} | {Token.string == "."})
+    {Token.kind == number, Token.length == 1}
+    ({Token.string == "+", !Split.kind == external} | {Token.string == "-", !Split.kind == external} | {Token.kind == word, !Split.kind == external})?
+    {Lookup.majorType == packyears}
+)
+|
+(
+    ({Token.kind == number, Token.length != 4} | {Lookup.majorType == number})
+    ({Token.string == "+", !Split.kind == external} | {Token.string == "-", !Split.kind == external} | {Token.kind == word, !Split.kind == external})?
+    {Lookup.majorType == packyears}
+)
+|
+(
+{Lookup.majorType == packyears}
+(
+(({Token.string == "="} | {Token.string == ":"} | {Token.string == "calculator"})?)
+|
+(
+({Token.string == "="} | {Token.string == ":"} | {Token.string == "calculator"})
+{Token.string == "less"}
+{Token.string == "than"}
+)
+)
+({Token.kind == number, Token.length != 4} | {Lookup.majorType == number})
+({Token.string == "/"} | {Token.string == "."})?
+({Token.kind == number, Token.length != 4} | {Lookup.majorType == number})?
+{Token.string != "-"}
+)
+
+):ppy
+-->
+:ppy.NumberPPY = {rule = "NumberPPY"}
+
+Rule: NumberPPY
+Priority: 30
+(
+    (
+    {Token.string == "-"}
+    ({Token.kind == number, Token.length != 4} | {Lookup.majorType == number})
+    ({Token.string == "/"} | {Token.string == "."})?
+    ({Token.kind == number, Token.length != 4} | {Lookup.majorType == number})?
+)
+|
+(
+    ({Token.kind == number, Token.length != 4} | {Lookup.majorType == number})
+    ({Token.string == "/"} | {Token.string == "."})
+    {Token.kind == number, Token.length == 1}
+    ({Token.string == "+", !Split.kind == external} | {Token.string == "-", !Split.kind == external} | {Token.kind == word, !Split.kind == external})?
+    {Lookup.majorType == cig}
+)
+|
+(
+    ({Token.kind == number, Token.length != 4} | {Lookup.majorType == number})
+    ({Token.string == "+", !Split.kind == external} | {Token.string == "-", !Split.kind == external} | {Token.kind == word, !Split.kind == external})?
+    {Lookup.majorType == cig}
+)
+|
+(
+{Lookup.majorType == packyears}
+(
+(({Token.string == "="} | {Token.string == ":"})?)
+|
+(
+({Token.string == "="} | {Token.string == ":"})
+{Token.string == "less"}
+{Token.string == "than"}
+)
+)
+({Token.kind == number, Token.length != 4} | {Lookup.majorType == number})
+({Token.string == "/"} | {Token.string == "."})?
+({Token.kind == number, Token.length != 4} | {Lookup.majorType == number})?
+{Token.string != "-"}
+)
+
+):cig
+-->
+:cig.NumberCIG = {rule = "NumberCIG"}
+
+
+// Rule: PPYNumberAll
+// Priority: 30
+// (
+// ( // 50-60 packyears
+//     ({Token.string == ">"} | {Token.string == "~"} | {Token.string == "+"} | {Token.string == "<"})?
+//     ({Token.kind == number, Token.length != 4} | {Lookup.majorType == number})
+//     ({Token.string == ".", !Split.kind == internal} | {Token.string == "-"})
+//     ({Token.kind == number} | {Lookup.majorType == number})
+//     ({Token.string == "+", !Split.kind == external} | {Token.string == "-", !Split.kind == external} | {Token.kind == word, !Split.kind == external})?
+//     )
+// |
+// ( // +10 packyears
+//     (({Token.string == ">"} | {Token.string == "~"} | {Token.string == "+"} | {Token.string == "<"})
+//     |
+//     ({Token.string == "less"}
+//     {Token.string == "than"})
+//     )?
+//     ({Token.kind == number, Token.length != 4} | {Lookup.majorType == number})
+//     ({Token.string == "+"} | {Token.string == "cigarette"} | {Token.string == "-"} | {Token.kind == word, !Split.kind == external, Token.string != "quit-"})?
+// )
+// ):packyear
+// -->
+// :packyear.PPYNumberAll = {rule = "packyears"}//, years = :number.Token.string}//, name = :number.Token.length}
+
